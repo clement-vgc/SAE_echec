@@ -285,14 +285,18 @@ class Roi(Piece):
         """Vérifie si le petit roque est possible."""
         ligne, colonne = self.position
         
+        # Le roi doit être à sa position initiale (colonne 4)
+        if colonne != 4:
+            return False
+        
         # Vérifier que les cases entre le roi et la tour sont vides
         for col in range(colonne + 1, colonne + 3):
             if not plateau.est_case_vide((ligne, col)):
                 return False
         
-        # Vérifier que la tour n'a pas bougé
+        # Vérifier que la tour existe et n'a pas bougé
         tour = plateau.obtenir_piece((ligne, 7))
-        if tour is None or not isinstance(tour, Tour) or tour.a_bouge:
+        if tour is None or tour.a_bouge:
             return False
         
         return True
@@ -301,14 +305,18 @@ class Roi(Piece):
         """Vérifie si le grand roque est possible."""
         ligne, colonne = self.position
         
+        # Le roi doit être à sa position initiale (colonne 4)
+        if colonne != 4:
+            return False
+        
         # Vérifier que les cases entre le roi et la tour sont vides
         for col in range(colonne - 3, colonne):
             if not plateau.est_case_vide((ligne, col)):
                 return False
         
-        # Vérifier que la tour n'a pas bougé
+        # Vérifier que la tour existe et n'a pas bougé
         tour = plateau.obtenir_piece((ligne, 0))
-        if tour is None or not isinstance(tour, Tour) or tour.a_bouge:
+        if tour is None or tour.a_bouge:
             return False
         
         return True

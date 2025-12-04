@@ -142,16 +142,10 @@ class Jeu:
         
         # Simuler le mouvement pour vérifier qu'il ne met pas le roi en échec
         plateau_test = self.plateau.copier()
-        piece_test = plateau_test.obtenir_piece(depart)
         
-        # Gérer l'en passant
-        piece_capturee_en_passant = None
+        # Gérer l'en passant dans la simulation
         if isinstance(piece, Pion) and arrivee == self.plateau.position_en_passant:
-            # En passant: capturer le pion adverse
-            ligne_arrivee, colonne_arrivee = arrivee
-            direction = 1 if piece.couleur == 'blanc' else -1
-            position_pion_capture = (ligne_arrivee + direction, colonne_arrivee)
-            piece_capturee_en_passant = plateau_test.retirer_piece(position_pion_capture)
+            self._effectuer_en_passant_sur_plateau(plateau_test, arrivee, piece.couleur)
         
         plateau_test.deplacer_piece(depart, arrivee)
         
@@ -205,12 +199,7 @@ class Jeu:
             # Mouvement normal
             # Gérer l'en passant
             if isinstance(piece, Pion) and arrivee == self.plateau.position_en_passant:
-                ligne_arrivee, colonne_arrivee = arrivee
-                direction = 1 if piece.couleur == 'blanc' else -1
-                position_pion_capture = (ligne_arrivee + direction, colonne_arrivee)
-                pion_capture = self.plateau.retirer_piece(position_pion_capture)
-                if pion_capture:
-                    self.plateau.pieces_capturees.append(pion_capture)
+                self._effectuer_en_passant_sur_plateau(self.plateau, arrivee, piece.couleur)
                 print("✓ Prise en passant")
             
             piece_capturee = self.plateau.deplacer_piece(depart, arrivee)
@@ -288,6 +277,22 @@ class Jeu:
         """
         return self._est_roi_en_echec(self.plateau, couleur)
     
+    def _effectuer_en_passant_sur_plateau(self, plateau: Plateau, arrivee: Tuple[int, int], couleur: str):
+        """
+        Effectue une prise en passant sur un plateau donné.
+        
+        Args:
+            plateau: Le plateau sur lequel effectuer la prise
+            arrivee: Position d'arrivée du pion
+            couleur: Couleur du pion qui capture
+        """
+        ligne_arrivee, colonne_arrivee = arrivee
+        direction = 1 if couleur == 'blanc' else -1
+        position_pion_capture = (ligne_arrivee + direction, colonne_arrivee)
+        pion_capture = plateau.retirer_piece(position_pion_capture)
+        if pion_capture:
+            plateau.pieces_capturees.append(pion_capture)
+    
     def _est_roi_en_echec(self, plateau: Plateau, couleur: str) -> bool:
         """
         Vérifie si le roi est en échec sur un plateau donné.
@@ -361,16 +366,17 @@ class Jeu:
         pieces = self.plateau.obtenir_toutes_pieces(couleur)
         
         for piece in pieces:
+            depart = piece.position
             mouvements_possibles = piece.mouvements_possibles(self.plateau)
             
             for arrivee in mouvements_possibles:
                 # Simuler le mouvement
                 plateau_test = self.plateau.copier()
-                plateau_test.deplacer_piece(piece.position, arrivee)
+                plateau_test.deplacer_piece(depart, arrivee)
                 
                 # Vérifier si le roi serait en échec
                 if not self._est_roi_en_echec(plateau_test, couleur):
-                    mouvements_legaux.append((piece.position, arrivee))
+                    mouvements_legaux.append((depart, arrivee))
         
         return mouvements_legaux
     
