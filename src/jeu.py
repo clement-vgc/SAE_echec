@@ -5,7 +5,7 @@ Module contenant la classe Jeu qui gère la logique du jeu d'échecs.
 from typing import List, Tuple, Optional
 from src.plateau import Plateau
 from src.joueur import Joueur
-from src.piece import Piece, Pion, Tour, Roi, Reine
+from src.piece import Piece, Pion, Tour, Roi, Reine, Fou, Cavalier
 
 
 class Jeu:
@@ -270,7 +270,6 @@ class Jeu:
             print("Choix invalide. Réessayez.")
         
         # Remplacer le pion par la nouvelle pièce
-        from src.piece import Fou, Cavalier
         nouvelle_piece = nouvelle_piece_classe(piece.couleur, position)
         nouvelle_piece.a_bouge = True
         self.plateau.placer_piece(nouvelle_piece, position)

@@ -65,6 +65,39 @@ class Piece(ABC):
         """
         return position_cible in self.mouvements_possibles(plateau)
     
+    def _mouvements_ligne_droite(self, plateau, directions: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+        """
+        Calcule les mouvements en ligne droite dans les directions données.
+        Méthode utilitaire pour Tour, Fou et Reine.
+        
+        Args:
+            plateau: Le plateau de jeu
+            directions: Liste de directions (delta_ligne, delta_colonne)
+            
+        Returns:
+            Liste des positions possibles
+        """
+        mouvements = []
+        ligne, colonne = self.position
+        
+        for d_ligne, d_colonne in directions:
+            nouvelle_ligne, nouvelle_colonne = ligne + d_ligne, colonne + d_colonne
+            
+            while plateau.est_position_valide((nouvelle_ligne, nouvelle_colonne)):
+                piece_cible = plateau.obtenir_piece((nouvelle_ligne, nouvelle_colonne))
+                
+                if piece_cible is None:
+                    mouvements.append((nouvelle_ligne, nouvelle_colonne))
+                else:
+                    if piece_cible.couleur != self.couleur:
+                        mouvements.append((nouvelle_ligne, nouvelle_colonne))
+                    break
+                
+                nouvelle_ligne += d_ligne
+                nouvelle_colonne += d_colonne
+        
+        return mouvements
+    
     def __str__(self) -> str:
         """Retourne la représentation textuelle de la pièce."""
         return self.symbole()
@@ -131,38 +164,6 @@ class Tour(Piece):
         La tour se déplace horizontalement et verticalement.
         """
         return self._mouvements_ligne_droite(plateau, [(0, 1), (0, -1), (1, 0), (-1, 0)])
-    
-    def _mouvements_ligne_droite(self, plateau, directions: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-        """
-        Calcule les mouvements en ligne droite dans les directions données.
-        
-        Args:
-            plateau: Le plateau de jeu
-            directions: Liste de directions (delta_ligne, delta_colonne)
-            
-        Returns:
-            Liste des positions possibles
-        """
-        mouvements = []
-        ligne, colonne = self.position
-        
-        for d_ligne, d_colonne in directions:
-            nouvelle_ligne, nouvelle_colonne = ligne + d_ligne, colonne + d_colonne
-            
-            while plateau.est_position_valide((nouvelle_ligne, nouvelle_colonne)):
-                piece_cible = plateau.obtenir_piece((nouvelle_ligne, nouvelle_colonne))
-                
-                if piece_cible is None:
-                    mouvements.append((nouvelle_ligne, nouvelle_colonne))
-                else:
-                    if piece_cible.couleur != self.couleur:
-                        mouvements.append((nouvelle_ligne, nouvelle_colonne))
-                    break
-                
-                nouvelle_ligne += d_ligne
-                nouvelle_colonne += d_colonne
-        
-        return mouvements
 
 
 class Cavalier(Piece):
@@ -214,29 +215,6 @@ class Fou(Piece):
         Le fou se déplace en diagonale.
         """
         return self._mouvements_ligne_droite(plateau, [(1, 1), (1, -1), (-1, 1), (-1, -1)])
-    
-    def _mouvements_ligne_droite(self, plateau, directions: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-        """Calcule les mouvements en ligne droite dans les directions données."""
-        mouvements = []
-        ligne, colonne = self.position
-        
-        for d_ligne, d_colonne in directions:
-            nouvelle_ligne, nouvelle_colonne = ligne + d_ligne, colonne + d_colonne
-            
-            while plateau.est_position_valide((nouvelle_ligne, nouvelle_colonne)):
-                piece_cible = plateau.obtenir_piece((nouvelle_ligne, nouvelle_colonne))
-                
-                if piece_cible is None:
-                    mouvements.append((nouvelle_ligne, nouvelle_colonne))
-                else:
-                    if piece_cible.couleur != self.couleur:
-                        mouvements.append((nouvelle_ligne, nouvelle_colonne))
-                    break
-                
-                nouvelle_ligne += d_ligne
-                nouvelle_colonne += d_colonne
-        
-        return mouvements
 
 
 class Reine(Piece):
@@ -257,29 +235,6 @@ class Reine(Piece):
             (1, 1), (1, -1), (-1, 1), (-1, -1)  # Diagonal
         ]
         return self._mouvements_ligne_droite(plateau, directions)
-    
-    def _mouvements_ligne_droite(self, plateau, directions: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-        """Calcule les mouvements en ligne droite dans les directions données."""
-        mouvements = []
-        ligne, colonne = self.position
-        
-        for d_ligne, d_colonne in directions:
-            nouvelle_ligne, nouvelle_colonne = ligne + d_ligne, colonne + d_colonne
-            
-            while plateau.est_position_valide((nouvelle_ligne, nouvelle_colonne)):
-                piece_cible = plateau.obtenir_piece((nouvelle_ligne, nouvelle_colonne))
-                
-                if piece_cible is None:
-                    mouvements.append((nouvelle_ligne, nouvelle_colonne))
-                else:
-                    if piece_cible.couleur != self.couleur:
-                        mouvements.append((nouvelle_ligne, nouvelle_colonne))
-                    break
-                
-                nouvelle_ligne += d_ligne
-                nouvelle_colonne += d_colonne
-        
-        return mouvements
 
 
 class Roi(Piece):
